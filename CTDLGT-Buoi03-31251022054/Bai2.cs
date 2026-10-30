@@ -8,100 +8,133 @@ namespace CTDLGT_Buoi03_31251022054
 {
     internal class Bai2
     {
-        // Class chứa thông tin khách hàng
-        class Customer
+        // Class chứa thông tin khách hàng, dùng class thay vì record cho dễ tiếp cận 
+        class KhachHang
         {
-            public int Id { get; set; }
-            public long Arrival { get; set; } // Thời điểm đến
-            public long Service { get; set; } // Thời gian phục vụ
+            public int SoThuTu { get; set; }
+            public long ThoiDiemDen { get; set; }
+            public int ThoiGianPhucVu { get; set; }
         }
         class Program
         {
-            static void Main(string[] args)
+            static void Main()
             {
-                Console.WriteLine("--- KẾT QUẢ KIỂM THỬ BÀI 2 ---");
-                // Ca 1: 1 quầy, 3 khách
-                Console.WriteLine("\nCa 1:");
-                MoPhongQuay(3, 1, new long[] { 0, 1, 2 }, new long[] { 5, 3, 4 });
-                // Ca 2: 2 quầy, 3 khách
-                Console.WriteLine("\nCa 2:");
-                MoPhongQuay(3, 2, new long[] { 0, 1, 2 }, new long[] { 5, 3, 4 });
-                // Ca 3: 2 quầy, 3 khách đến cùng lúc
-                Console.WriteLine("\nCa 3:");
-                MoPhongQuay(3, 2, new long[] { 0, 0, 0 }, new long[] { 3, 3, 3 });
-                // Ca 4: Quầy rảnh rồi mới có khách
-                Console.WriteLine("\nCa 4:");
-                MoPhongQuay(2, 1, new long[] { 0, 10 }, new long[] { 2, 3 });
-                // Ca 5: k lớn hơn n (3 quầy, 1 khách)
-                Console.WriteLine("\nCa 5:");
-                MoPhongQuay(1, 3, new long[] { 4 }, new long[] { 6 });
-                // Ca 6: Ca lớn n = 100.000, k = 10
-                Console.WriteLine("\nCa 6 (Đang chạy ca lớn 100k khách...):");
-                int n_lon = 100000;
-                long[] arr_lon = new long[n_lon];
-                long[] srv_lon = new long[n_lon];
-                for (int i = 0; i < n_lon; i++)
+                Console.OutputEncoding = System.Text.Encoding.UTF8;
+                while (true)
                 {
-                    arr_lon[i] = i; // Khách i đến lúc i (theo đề là i-1, ở đây khởi tạo theo logic vòng lặp)
-                    srv_lon[i] = 10;
+                    Console.WriteLine("\n========== MENU BÀI 2 ==========");
+                    Console.WriteLine("1. Chạy 5 ca kiểm thử đầu tiên (Ca 1 - Ca 5)");
+                    Console.WriteLine("2. Chạy Ca lớn 6 (100.000 khách, 10 quầy)");
+                    Console.WriteLine("3. Thoát chương trình");
+                    Console.Write("Nhập lựa chọn của bạn (1-3): ");
+                    string luaChon = Console.ReadLine() ?? "";
+                    if (luaChon == "1")
+                    {
+                        Console.WriteLine("\n--- KẾT QUẢ CA 1 ĐẾN 5 ---");
+
+                        Console.WriteLine("\nCa 1 (1 quầy, 3 khách):");
+                        MoPhongQuay(3, 1, new long[] { 0, 1, 2 }, new int[] { 5, 3, 4 }, true);
+
+                        Console.WriteLine("\nCa 2 (2 quầy, 3 khách nối tiếp):");
+                        MoPhongQuay(3, 2, new long[] { 0, 1, 2 }, new int[] { 5, 3, 4 }, true);
+
+                        Console.WriteLine("\nCa 3 (2 quầy, 3 khách đến cùng lúc):");
+                        MoPhongQuay(3, 2, new long[] { 0, 0, 0 }, new int[] { 3, 3, 3 }, true);
+
+                        Console.WriteLine("\nCa 4 (Quầy rảnh rồi mới có khách):");
+                        MoPhongQuay(2, 1, new long[] { 0, 10 }, new int[] { 2, 3 }, true);
+
+                        Console.WriteLine("\nCa 5 (Số quầy nhiều hơn khách):");
+                        MoPhongQuay(1, 3, new long[] { 4 }, new int[] { 6 }, true);
+                    }
+                    else if (luaChon == "2")
+                    {
+                        Console.WriteLine("\nĐang chạy Ca 6 (100k khách)...");
+                        int n = 100000;
+                        int k = 10;
+                        long[] den = new long[n];
+                        int[] phucVu = new int[n];
+                        // Khách thứ i đến lúc i - 1, thời gian phục vụ là 10.
+                        for (int i = 0; i < n; i++)
+                        {
+                            den[i] = i > 0 ? i - 1 : 0; // Tránh khách đầu tiên có thời gian âm.
+                            phucVu[i] = 10;
+                        }
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        Stopwatch sw = Stopwatch.StartNew();
+                        // Tham số false để không in chi tiết từng người ra màn hình, tránh treo Console.
+                        MoPhongQuay(n, k, den, phucVu, false);
+                        sw.Stop();
+                        Console.WriteLine($"-> Thời gian chạy Ca 6: {sw.ElapsedMilliseconds} ms");
+                    }
+                    else if (luaChon == "3")
+                    {
+                        Console.WriteLine("Đã thoát chương trình!");
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Lựa chọn không hợp lệ!");
+                    }
                 }
-                var sw = Stopwatch.StartNew();
-                // Đóng console output tạm cho ca lớn để đo thời gian chính xác, mình chạy ngầm
-                MoPhongQuay(n_lon, 10, arr_lon, srv_lon, inChiTiet: false);
-                sw.Stop();
-                Console.WriteLine($"Thời gian chạy Ca 6: {sw.ElapsedMilliseconds} ms");
-                Console.ReadLine();
             }
-            // Hàm tổng quát mô phỏng
-            static void MoPhongQuay(int n, int k, long[] arrivals, long[] services, bool inChiTiet = true)
+            // Hàm xử lý chính tính toán thời gian chờ ở quầy
+            static void MoPhongQuay(int n, int k, long[] mangThoiDiemDen, int[] mangThoiGianPhucVu, bool inChiTiet)
             {
-                // Dùng Queue để lưu khách hàng theo đúng thứ tự đến (FIFO).
-                Queue<Customer> q = new Queue<Customer>();
+                // Dùng Queue (FIFO) để khách đến trước chắc chắn được phục vụ trước.
+                Queue<KhachHang> hangDoi = new Queue<KhachHang>();
+
                 for (int i = 0; i < n; i++)
                 {
-                    q.Enqueue(new Customer { Id = i + 1, Arrival = arrivals[i], Service = services[i] });
-                }
-                // Mảng lưu thời điểm rảnh của từng quầy. Ban đầu các quầy rảnh ở thời điểm 0.
-                long[] freeTime = new long[k];
-                long totalWait = 0;
-                long maxWait = 0;
-                long finishTime = 0;
-                while (q.Count > 0)
-                {
-                    // Lấy khách hàng ở đầu hàng đợi ra để xếp quầy.
-                    var cus = q.Dequeue();
-                    // Quét qua k quầy để tìm quầy rảnh sớm nhất.
-                    int bestCounter = 0;
-                    for (int j = 1; j < k; j++)
+                    hangDoi.Enqueue(new KhachHang
                     {
-                        if (freeTime[j] < freeTime[bestCounter])
+                        SoThuTu = i + 1,
+                        ThoiDiemDen = mangThoiDiemDen[i],
+                        ThoiGianPhucVu = mangThoiGianPhucVu[i]
+                    });
+                }
+                // Mảng lưu thời điểm rảnh của từng quầy. Các quầy ban đầu rảnh lúc 0.
+                long[] thoiDiemRanh = new long[k];
+                // Bắt buộc dùng long vì tổng thời gian chờ của 100k khách có thể vượt giới hạn 2 tỷ của int.
+                long tongCho = 0;
+                long choLauNhat = 0;
+                long hoanThanhLuc = 0;
+                // Xử lý từng khách cho đến khi hết hàng đợi.
+                while (hangDoi.Count > 0)
+                {
+                    var khach = hangDoi.Dequeue();
+                    // Quét qua tất cả các quầy để tìm quầy rảnh việc sớm nhất. Chi phí đoạn này là Theta(k).
+                    int quayTotNhat = 0;
+                    for (int i = 1; i < k; i++)
+                    {
+                        if (thoiDiemRanh[i] < thoiDiemRanh[quayTotNhat])
                         {
-                            bestCounter = j;
+                            quayTotNhat = i;
                         }
                     }
-                    // Thời điểm bắt đầu là giá trị lớn hơn giữa lúc quầy rảnh và lúc khách đến.
-                    long start = Math.Max(freeTime[bestCounter], cus.Arrival);
-                    long wait = start - cus.Arrival;
-                    long end = start + cus.Service;
-                    // Cộng dồn tổng thời gian chờ và cập nhật kỷ lục chờ lâu nhất.
-                    totalWait += wait;
-                    if (wait > maxWait) maxWait = wait;
-                    // Cập nhật lại thời điểm rảnh của quầy vừa phục vụ.
-                    freeTime[bestCounter] = end;
-                    // Cập nhật thời điểm hoàn thành chung của toàn hệ thống.
-                    if (end > finishTime) finishTime = end;
-
+                    // Nếu khách đến trễ hơn lúc quầy rảnh thì phục vụ ngay. Nếu đến sớm hơn lúc quầy rảnh thì phải chờ.
+                    long thoiDiemBatDau = Math.Max(thoiDiemRanh[quayTotNhat], khach.ThoiDiemDen);
+                    long thoiGianCho = thoiDiemBatDau - khach.ThoiDiemDen;
+                    long thoiDiemXong = thoiDiemBatDau + khach.ThoiGianPhucVu;
+                    // Cộng dồn vào tổng và cập nhật người chờ lâu nhất.
+                    tongCho += thoiGianCho;
+                    if (thoiGianCho > choLauNhat) choLauNhat = thoiGianCho;
+                    // Cập nhật lại thời điểm rảnh của quầy vừa nhận khách.
+                    thoiDiemRanh[quayTotNhat] = thoiDiemXong;
+                    // Ghi nhận thời điểm quầy đóng cửa (khách cuối cùng rời đi).
+                    if (thoiDiemXong > hoanThanhLuc) hoanThanhLuc = thoiDiemXong;
                     if (inChiTiet)
                     {
-                        Console.WriteLine($"KH {cus.Id}: den {cus.Arrival}, quay {bestCounter + 1}, bat dau {start}, cho {wait}, xong {end}");
+                        Console.WriteLine($"KH {khach.SoThuTu}: den {khach.ThoiDiemDen}, quay {quayTotNhat + 1}, bat dau {thoiDiemBatDau}, cho {thoiGianCho}, xong {thoiDiemXong}");
                     }
                 }
-                // In ra thống kê cuối cùng
-                double avgWait = (double)totalWait / n;
-                Console.WriteLine($"Cho trung binh: {avgWait.ToString("0.00", CultureInfo.InvariantCulture)}");
-                Console.WriteLine($"Cho lau nhat: {maxWait}");
-                Console.WriteLine($"Hoan thanh luc: {finishTime}");
+                // In kết quả tổng hợp bằng định dạng số thực 2 chữ số thập phân (dấu chấm).
+                double trungBinhCho = (double)tongCho / n;
+                Console.WriteLine($"Cho trung binh: {trungBinhCho.ToString("0.00", CultureInfo.InvariantCulture)}");
+                Console.WriteLine($"Cho lau nhat: {choLauNhat}");
+                Console.WriteLine($"Hoan thanh luc: {hoanThanhLuc}");
             }
         }
     }
-}
+} 

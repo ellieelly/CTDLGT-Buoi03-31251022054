@@ -6,6 +6,7 @@
     <RootNamespace>CTDLGT_Buoi03_31251022054</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <StartupObject>CTDLGT_Buoi03_31251022054.Bai3.Program</StartupObject>
   </PropertyGroup>
 
 </Project>
